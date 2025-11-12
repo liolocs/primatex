@@ -2,6 +2,7 @@
 import { Command } from "commander";
 import { runCommand } from "./commands/run.ts";
 import { addCommand } from "./commands/add.ts";
+import { scnCommand } from "./commands/scn.ts";
 
 const program = new Command();
 
@@ -21,9 +22,17 @@ program
 
 program
   .command("add <module>")
-  .description("Add and configure modules (e.g., tailwind)")
+  .description("Add and configure modules (e.g., tailwind, shadcn)")
   .action(async (module: string) => {
     await addCommand(module);
+  });
+
+program
+  .command("scn [args...]")
+  .description("Add shadcn components (proxy for shadcn CLI)")
+  .allowUnknownOption()
+  .action(async (args: string[]) => {
+    await scnCommand(args || []);
   });
 
 program.parse(process.argv);

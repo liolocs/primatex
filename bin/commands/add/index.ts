@@ -1,6 +1,6 @@
 import boxen from "boxen";
-import { addTailwind } from "./add/tailwind.ts";
-import { addShadcn } from "./add/shadcn.ts";
+import { addShadcn } from "./shadcn.ts";
+import { addTailwind } from "./tailwind.ts";
 
 export async function addCommand(module: string) {
     switch (module.toLowerCase()) {
