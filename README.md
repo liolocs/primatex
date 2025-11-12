@@ -1,4 +1,4 @@
-# primate-wrap
+# Primatex
 
 A Bun-based CLI wrapper for Primate with automatic package installation and helpful utilities.
 
@@ -178,17 +178,17 @@ The command automatically detects existing configurations and skips already-conf
 
 ## Development
 
-The source code is located at `~/Development/primate-wrap`.
+The source code is located at `~/<your-package-location>/primatex`.
 
 To make changes:
 
-1. Edit files in `~/Development/primate-wrap`
+1. Edit files in `~/<your-package-location>/primatex`
 2. The package is linked globally, so changes take effect immediately
 
 ## Project Structure
 
 ```
-~/Development/primate-wrap/
+~/<your-package-location>/primatex/
 ├── package.json
 ├── bin/
 │   ├── px.ts              # Main CLI entry point
@@ -211,12 +211,12 @@ To make changes:
 -   Bun installed and available on PATH
 -   `~/.bun/bin` in PATH (already configured in your `.zshrc`)
 
-## Updating
+## Testing locally
 
-After making changes to the code in `~/Development/primate-wrap`, run:
+After making changes to the code in `~/<your-package-location>/primatex`, run:
 
 ```bash
-cd ~/Development/primate-wrap && bun unlink && bun link
+bun unlink && bun link
 ```
 
 This updates the global installation with your changes.
