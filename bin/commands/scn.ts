@@ -177,19 +177,23 @@ function fixImports(filePath: string, framework: Framework, projectRoot: string)
             }
             
             // Resolve the actual file path
-            const fullImportPath = join(projectRoot, "components", importPath);
             const resolvedPath = resolveComponentPath(projectRoot, `components/${importPath}`, fileExt);
             
-            // Determine the correct extension
-            let ext = fileExt;
+            // Determine the correct extension based on what was resolved
+            let targetPath = importPath;
             if (resolvedPath.endsWith("/index.ts")) {
-                ext = "/index.ts";
+                targetPath = `${importPath}/index.ts`;
             } else if (resolvedPath.endsWith(`/index${fileExt}`)) {
-                ext = `/index${fileExt}`;
+                targetPath = `${importPath}/index${fileExt}`;
+            } else {
+                targetPath = `${importPath}${fileExt}`;
             }
             
-            // Calculate relative path from current file
-            const relativePath = calculateRelativePath(filePath, `components/${importPath}${ext}`);
+            // Build the target path relative to project root for calculation
+            const targetFullPath = join(projectRoot, "components", targetPath);
+            
+            // Calculate relative path from current file to target
+            const relativePath = calculateRelativePath(filePath, targetFullPath);
             
             return `from "${relativePath}"`;
         }
