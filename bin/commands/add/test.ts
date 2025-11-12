@@ -1,8 +1,8 @@
+import { checkbox } from "@inquirer/prompts";
 import boxen from "boxen";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import ora from "ora";
 import { join } from "path";
-import { checkbox } from "@inquirer/prompts";
 import { installPackages } from "../../utils/packages.ts";
 import { detectManager, findProjectRoot } from "../../utils/project.ts";
 
@@ -22,7 +22,9 @@ function isVitestConfigured(projectRoot: string): boolean {
 
     try {
         const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-        return !!(packageJson.devDependencies && packageJson.devDependencies.vitest);
+        return !!(
+            packageJson.devDependencies && packageJson.devDependencies.vitest
+        );
     } catch {
         return false;
     }
@@ -42,7 +44,10 @@ function isPlaywrightConfigured(projectRoot: string): boolean {
 
     try {
         const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-        return !!(packageJson.devDependencies && packageJson.devDependencies["@playwright/test"]);
+        return !!(
+            packageJson.devDependencies &&
+            packageJson.devDependencies["@playwright/test"]
+        );
     } catch {
         return false;
     }
@@ -51,17 +56,20 @@ function isPlaywrightConfigured(projectRoot: string): boolean {
 // Ask user which testing setup they want
 async function askTestChoice(): Promise<TestOption[]> {
     const answer = await checkbox({
-        message: "Select testing setup (use space to select, enter to confirm):",
+        message:
+            "Select testing setup (use space to select, enter to confirm):",
         choices: [
             {
                 name: "Unit testing with Vitest",
                 value: "vitest",
-                description: "Browser-based unit testing with Vitest + Playwright",
+                description:
+                    "Browser-based unit testing with Vitest + Playwright",
             },
             {
                 name: "E2E BDD testing with Playwright",
                 value: "playwright",
-                description: "End-to-end BDD testing with Playwright + Cucumber",
+                description:
+                    "End-to-end BDD testing with Playwright + Cucumber",
             },
         ],
     });
@@ -70,7 +78,10 @@ async function askTestChoice(): Promise<TestOption[]> {
 }
 
 // Setup Vitest
-async function setupVitest(projectRoot: string, manager: string): Promise<void> {
+async function setupVitest(
+    projectRoot: string,
+    manager: string
+): Promise<void> {
     console.log(
         boxen("🧪 Setting up Vitest", {
             padding: 1,
@@ -158,7 +169,7 @@ export default defineConfig({
 
     console.log(
         boxen(
-            "✅ Vitest setup complete!\n\n🚀 Run 'bun test' to run tests\n📚 Vitest docs: https://vitest.dev",
+            "✅ Vitest setup complete!\n\n🚀 Run 'bun run test' to run tests\n📚 Vitest docs: https://vitest.dev",
             {
                 padding: 1,
                 margin: 1,
@@ -170,7 +181,10 @@ export default defineConfig({
 }
 
 // Setup Playwright
-async function setupPlaywright(projectRoot: string, manager: string): Promise<void> {
+async function setupPlaywright(
+    projectRoot: string,
+    manager: string
+): Promise<void> {
     console.log(
         boxen("🎭 Setting up Playwright with BDD", {
             padding: 1,
@@ -324,9 +338,22 @@ export default defineConfig({
     writeFileSync(playwrightConfigPath, playwrightConfig);
     console.log("✅ Created playwright.config.ts");
 
+    // Update package.json scripts
+    const packageJsonPath = join(projectRoot, "package.json");
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+
+    if (!packageJson.scripts) {
+        packageJson.scripts = {};
+    }
+
+    packageJson.scripts.e2e = "bunx bddgen && playwright test";
+
+    writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    console.log("✅ Updated package.json scripts");
+
     console.log(
         boxen(
-            "✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/demo.feature\n   to match your actual application content\n\n🚀 Run 'npx playwright test' to run tests\n📚 Playwright docs: https://playwright.dev",
+            "✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/demo.feature\n   to match your actual application content\n\n🚀 Run 'bun e2e' to run tests\n📚 Playwright docs: https://playwright.dev",
             {
                 padding: 1,
                 margin: 1,
@@ -359,15 +386,12 @@ export async function addTest() {
 
     if (vitestConfigured && playwrightConfigured) {
         console.log(
-            boxen(
-                "✅ Both Vitest and Playwright are already configured!",
-                {
-                    padding: 1,
-                    margin: 1,
-                    borderStyle: "round",
-                    borderColor: "green",
-                }
-            )
+            boxen("✅ Both Vitest and Playwright are already configured!", {
+                padding: 1,
+                margin: 1,
+                borderStyle: "round",
+                borderColor: "green",
+            })
         );
         return;
     }
@@ -385,26 +409,27 @@ export async function addTest() {
 
     if (!vitestConfigured && !playwrightConfigured) {
         choices = await askTestChoice();
-        
+
         if (choices.length === 0) {
             console.log(
-                boxen(
-                    "❌ No testing options selected",
-                    {
-                        padding: 1,
-                        margin: 1,
-                        borderStyle: "round",
-                        borderColor: "red",
-                    }
-                )
+                boxen("❌ No testing options selected", {
+                    padding: 1,
+                    margin: 1,
+                    borderStyle: "round",
+                    borderColor: "red",
+                })
             );
             return;
         }
     } else if (vitestConfigured && !playwrightConfigured) {
-        console.log("\n🎭 Setting up Playwright (Vitest already configured)...\n");
+        console.log(
+            "\n🎭 Setting up Playwright (Vitest already configured)...\n"
+        );
         choices = ["playwright"];
     } else if (!vitestConfigured && playwrightConfigured) {
-        console.log("\n🧪 Setting up Vitest (Playwright already configured)...\n");
+        console.log(
+            "\n🧪 Setting up Vitest (Playwright already configured)...\n"
+        );
         choices = ["vitest"];
     } else {
         return;
@@ -419,4 +444,3 @@ export async function addTest() {
         }
     }
 }
-
