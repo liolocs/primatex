@@ -1,0 +1,14 @@
+{
+  "name": "primate-wrap",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "p-run": "bin/p-run.ts"
+  },
+  "description": "Auto-install missing packages for Primate projects",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ora": "^9.0.0"
+  }
+}
