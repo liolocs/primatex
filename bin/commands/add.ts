@@ -116,40 +116,75 @@ export default {
     let appConfigUpdated = false;
 
     if (existsSync(appConfigPath)) {
-        const existingConfig = readFileSync(appConfigPath, "utf-8");
+        let existingConfig = readFileSync(appConfigPath, "utf-8");
 
-        // Check if CSS is already configured
-        if (
-            !existingConfig.includes("/master.css") &&
-            !existingConfig.includes("master.css")
-        ) {
-            // Try to add CSS import intelligently
-            if (existingConfig.includes("export default")) {
-                const updatedConfig = existingConfig.replace(
-                    /export default\s*{/,
-                    `export default {\n  css: ["/master.css"],`
-                );
-                writeFileSync(appConfigPath, updatedConfig);
-                console.log("✅ Updated config/app.ts to include master.css");
-                appConfigUpdated = true;
+        // Check if tailwind is already imported
+        if (!existingConfig.includes("@primate/tailwind")) {
+            // Add tailwind import after other imports
+            const importRegex = /(import\s+\w+\s+from\s+["']@primate\/\w+["'];?\s*\n)/g;
+            const matches = existingConfig.match(importRegex);
+            
+            if (matches && matches.length > 0) {
+                // Add after the last @primate import
+                const lastImport = matches[matches.length - 1];
+                const lastImportIndex = existingConfig.lastIndexOf(lastImport);
+                const insertPosition = lastImportIndex + lastImport.length;
+                
+                existingConfig = 
+                    existingConfig.slice(0, insertPosition) +
+                    'import tailwind from "@primate/tailwind";\n' +
+                    existingConfig.slice(insertPosition);
             } else {
-                console.log(
-                    "⚠️  Please manually add this to your config/app.ts:"
-                );
-                console.log(`\n  css: ["/master.css"],\n`);
+                // Add at the beginning if no @primate imports found
+                existingConfig = 'import tailwind from "@primate/tailwind";\n' + existingConfig;
             }
+
+            // Add tailwind() to modules array
+            if (existingConfig.includes("modules:")) {
+                // Find the modules array and add tailwind()
+                existingConfig = existingConfig.replace(
+                    /modules:\s*\[([^\]]*)\]/,
+                    (match, modulesList) => {
+                        // Check if tailwind() is already in the list
+                        if (modulesList.includes("tailwind()")) {
+                            return match;
+                        }
+                        // Add tailwind() to the modules list
+                        const trimmedModules = modulesList.trim();
+                        if (trimmedModules === "") {
+                            return `modules: [tailwind()]`;
+                        }
+                        // Check if the list ends with a comma or not
+                        const needsComma = trimmedModules.endsWith(",") ? "" : ",";
+                        return `modules: [${modulesList}${needsComma} tailwind()]`;
+                    }
+                );
+            } else {
+                // Add modules array if it doesn't exist
+                existingConfig = existingConfig.replace(
+                    /export default config\(\{/,
+                    `export default config({\n    modules: [tailwind()],`
+                );
+            }
+
+            writeFileSync(appConfigPath, existingConfig);
+            console.log("✅ Updated config/app.ts to include @primate/tailwind module");
+            appConfigUpdated = true;
         } else {
-            console.log("⚠️  config/app.ts already references master.css");
+            console.log("⚠️  config/app.ts already includes @primate/tailwind");
             appConfigUpdated = true;
         }
     } else {
-        // Create new config file
-        const newConfig = `export default {
-  css: ["/master.css"],
-};
+        // Create new config file with tailwind
+        const newConfig = `import tailwind from "@primate/tailwind";
+import config from "primate/config";
+
+export default config({
+    modules: [tailwind()],
+});
 `;
         writeFileSync(appConfigPath, newConfig);
-        console.log("✅ Created config/app.ts with CSS configuration");
+        console.log("✅ Created config/app.ts with Tailwind configuration");
         appConfigUpdated = true;
     }
 

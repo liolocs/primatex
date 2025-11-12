@@ -36,8 +36,10 @@ px add tailwind
 **What it does:**
 - Installs `@primate/tailwind` and `tailwindcss`
 - Creates `tailwind.config.js` with proper content paths (views, components, routes, lib)
-- Creates/updates `static/master.css` with Tailwind directives
-- Updates `config/app.ts` to include the CSS file
+- Creates/updates `static/master.css` with `@import "tailwindcss"`
+- Updates `config/app.ts` to:
+  - Add `import tailwind from "@primate/tailwind"`
+  - Add `tailwind()` to the modules array
 
 ## Features
 
