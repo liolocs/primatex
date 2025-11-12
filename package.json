@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "boxen": "^8.0.1",
     "ora": "^9.0.0"
   }
 }

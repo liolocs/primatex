@@ -70,3 +70,13 @@ To make changes:
 - Bun installed and available on PATH
 - `~/.bun/bin` in PATH (already configured in your `.zshrc`)
 
+## Updating
+
+After making changes to the code in `~/Development/primate-wrap`, run:
+
+```bash
+cd ~/Development/primate-wrap && bun unlink && bun link
+```
+
+This updates the global installation with your changes.
+
