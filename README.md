@@ -4,20 +4,20 @@ A Bun-based CLI wrapper for Primate that automatically installs missing packages
 
 ## Installation
 
-The package is already installed globally via `bun link`. The `p-run` command is available system-wide.
+The package is already installed globally via `bun link`. The `prun` command is available system-wide.
 
 ## Usage
 
 Instead of running `bunx --bun primate`, use:
 
 ```bash
-p-run
+prun
 ```
 
 Or with arguments:
 
 ```bash
-p-run -- [primate arguments]
+prun -- [primate arguments]
 ```
 
 ## Features
@@ -61,7 +61,7 @@ To make changes:
 ~/Development/primate-wrap/
 ├── package.json
 ├── bin/
-│   └── p-run.ts    # Main CLI script
+│   └── prun.ts    # Main CLI script
 └── README.md
 ```
 

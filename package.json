@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "bin": {
-    "p-run": "bin/p-run.ts"
+    "prun": "bin/prun.ts"
   },
   "description": "Auto-install missing packages for Primate projects",
   "author": "",
