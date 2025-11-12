@@ -112,11 +112,10 @@ px add test
 
 **Interactive Setup:**
 
-When you run `px add test`, you'll be prompted to choose:
+When you run `px add test`, you'll be prompted to choose between:
 
 1. Unit testing with Vitest
 2. E2E BDD testing with Playwright
-3. Both
 
 The command automatically detects existing configurations and skips already-configured options.
 

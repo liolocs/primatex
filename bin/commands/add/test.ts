@@ -167,9 +167,18 @@ export default defineConfig({
     writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
     console.log("✅ Updated package.json scripts");
 
+    // Get the appropriate run command for the package manager
+    const runCommands: Record<string, string> = {
+        bun: "bun test",
+        pnpm: "pnpm test",
+        yarn: "yarn test",
+        npm: "npm test",
+    };
+    const runCommand = runCommands[manager] || "npm test";
+
     console.log(
         boxen(
-            "✅ Vitest setup complete!\n\n🚀 Run 'bun run test' to run tests\n📚 Vitest docs: https://vitest.dev",
+            `✅ Vitest setup complete!\n\n🚀 Run '${runCommand}' to run tests\n📚 Vitest docs: https://vitest.dev`,
             {
                 padding: 1,
                 margin: 1,
@@ -244,9 +253,9 @@ Then("I should see {string} text", async ({ page }, content: string) => {
     // Create demo.feature
     const demoFeaturePath = join(featuresDir, "demo.feature");
     const demoFeatureContent = `Feature: Demo functionality
-
   As a user
   I want to be able to view the demo page
+
   Scenario: User visits home page
     Given I am on the home page
     Then I should see "counter" text
@@ -346,14 +355,31 @@ export default defineConfig({
         packageJson.scripts = {};
     }
 
-    packageJson.scripts.e2e = "bunx bddgen && playwright test";
+    // Set the e2e script based on package manager
+    const bddgenCommands: Record<string, string> = {
+        bun: "bunx bddgen",
+        pnpm: "pnpm dlx bddgen",
+        yarn: "yarn dlx bddgen",
+        npm: "npx bddgen",
+    };
+    const bddgenCommand = bddgenCommands[manager] || "npx bddgen";
+    packageJson.scripts.e2e = `${bddgenCommand} && playwright test`;
 
     writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
     console.log("✅ Updated package.json scripts");
 
+    // Get the appropriate run command for the package manager
+    const runCommands: Record<string, string> = {
+        bun: "bun e2e",
+        pnpm: "pnpm e2e",
+        yarn: "yarn e2e",
+        npm: "npm run e2e",
+    };
+    const runCommand = runCommands[manager] || "npm run e2e";
+
     console.log(
         boxen(
-            "✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/demo.feature\n   to match your actual application content\n\n🚀 Run 'bun e2e' to run tests\n📚 Playwright docs: https://playwright.dev",
+            `✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/demo.feature\n   to match your actual application content\n\n🚀 Run '${runCommand}' to run tests\n📚 Playwright docs: https://playwright.dev`,
             {
                 padding: 1,
                 margin: 1,
