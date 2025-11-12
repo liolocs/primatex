@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "bin": {
-    "prun": "bin/prun.ts"
+    "px": "bin/px.ts"
   },
-  "description": "Auto-install missing packages for Primate projects",
+  "description": "Primate CLI wrapper with auto-install and utilities",
   "author": "",
   "license": "MIT",
   "dependencies": {
     "boxen": "^8.0.1",
+    "commander": "^14.0.2",
     "ora": "^9.0.0"
   }
 }

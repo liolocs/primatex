@@ -1,24 +1,43 @@
 # primate-wrap
 
-A Bun-based CLI wrapper for Primate that automatically installs missing packages when they're detected.
+A Bun-based CLI wrapper for Primate with automatic package installation and helpful utilities.
 
 ## Installation
 
-The package is already installed globally via `bun link`. The `prun` command is available system-wide.
+The package is installed globally via `bun link`. The `px` command is available system-wide.
 
-## Usage
+## Commands
 
-Instead of running `bunx --bun primate`, use:
+### `px run`
 
-```bash
-prun
-```
-
-Or with arguments:
+Run Primate with automatic package installation. Monitors output for missing package errors and installs them automatically.
 
 ```bash
-prun -- [primate arguments]
+px run
+px run -- [primate arguments]
 ```
+
+**Features:**
+- Auto-detects missing packages from build errors
+- Kills hanging processes when errors are found
+- Installs packages using the correct package manager (bun/pnpm/yarn/npm)
+- Automatically runs `px add tailwind` + package manager install if `@primate/tailwind` is missing
+- Retries automatically after installation
+- Shows real-time output with elegant spinners
+
+### `px add tailwind`
+
+Set up Tailwind CSS for your Primate project automatically.
+
+```bash
+px add tailwind
+```
+
+**What it does:**
+- Installs `@primate/tailwind` and `tailwindcss`
+- Creates `tailwind.config.js` with proper content paths (views, components, routes, lib)
+- Creates/updates `static/master.css` with Tailwind directives
+- Updates `config/app.ts` to include the CSS file
 
 ## Features
 
@@ -35,12 +54,13 @@ prun -- [primate arguments]
 - **Retry loop**: Attempts up to 5 times to resolve all missing packages
 - **Pass-through arguments**: All CLI args are forwarded to Primate
 
-## How it works
+## How `px run` Works
 
 1. Finds the nearest `package.json` by walking up from the current directory
 2. Detects the package manager from lockfiles
-3. Runs `bunx --bun primate` with any provided arguments
+3. Runs `bunx --bun primate` with any provided arguments and streams output in real-time
 4. If "Could not resolve" errors are detected:
+   - Immediately kills the hanging process
    - Extracts the missing package names
    - Installs them using the detected package manager
    - Retries running Primate
@@ -55,13 +75,20 @@ To make changes:
 1. Edit files in `~/Development/primate-wrap`
 2. The package is linked globally, so changes take effect immediately
 
-## Project structure
+## Project Structure
 
 ```
 ~/Development/primate-wrap/
 ├── package.json
 ├── bin/
-│   └── prun.ts    # Main CLI script
+│   ├── px.ts              # Main CLI entry point
+│   ├── commands/
+│   │   ├── run.ts         # px run command
+│   │   └── add.ts         # px add command
+│   └── utils/
+│       ├── project.ts     # Project detection utilities
+│       ├── packages.ts    # Package management utilities
+│       └── primate.ts     # Primate process runner
 └── README.md
 ```
 
