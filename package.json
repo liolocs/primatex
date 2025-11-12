@@ -1,17 +1,17 @@
 {
-  "name": "primate-wrap",
-  "version": "1.0.0",
-  "type": "module",
-  "bin": {
-    "px": "bin/px.ts"
-  },
-  "description": "Primate CLI wrapper with auto-install and utilities",
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@inquirer/prompts": "^7.10.0",
-    "boxen": "^8.0.1",
-    "commander": "^14.0.2",
-    "ora": "^9.0.0"
-  }
+    "name": "primatex",
+    "version": "1.0.0",
+    "type": "module",
+    "bin": {
+        "px": "bin/px.ts"
+    },
+    "description": "Primate CLI wrapper with auto-install and utilities",
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@inquirer/prompts": "^7.10.0",
+        "boxen": "^8.0.1",
+        "commander": "^14.0.2",
+        "ora": "^9.0.0"
+    }
 }
