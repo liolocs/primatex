@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@inquirer/prompts": "^7.10.0",
     "boxen": "^8.0.1",
     "commander": "^14.0.2",
     "ora": "^9.0.0"

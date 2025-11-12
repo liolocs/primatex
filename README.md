@@ -102,6 +102,54 @@ px scn add card alert dialog
 px scn add dashboard-01
 ```
 
+### `px add test`
+
+Set up testing infrastructure for your Primate project with Vitest and/or Playwright.
+
+```bash
+px add test
+```
+
+**Interactive Setup:**
+
+When you run `px add test`, you'll be prompted to choose:
+
+1. Unit testing with Vitest
+2. E2E BDD testing with Playwright
+3. Both
+
+The command automatically detects existing configurations and skips already-configured options.
+
+**Vitest Setup (Unit Testing):**
+
+-   **Installs**: `vitest`, `@vitest/browser`, `vitest-browser-svelte`, `@vitest/browser-playwright`, `@sveltejs/vite-plugin-svelte`, `@vitest/ui`
+-   **Creates `vitest.config.js`**: Configured for browser mode with Playwright and Svelte support
+-   **Creates `vitest-setup-client.ts`**: Type references for Vitest browser matchers
+-   **Updates `package.json` scripts**:
+    -   `test`: Run tests once
+    -   `test:ui`: Run tests with UI
+    -   `test:watch`: Run tests in watch mode
+-   Test files: `components/**/*.{test,spec}.{js,ts,jsx,tsx}`
+
+**Playwright Setup (E2E BDD Testing):**
+
+-   **Installs**: `@playwright/test`, `playwright`, `playwright-bdd`
+-   **Creates directory structure**:
+    ```
+    test/
+      e2e/
+        features/
+          demo.feature
+        steps/
+          demo.step.ts
+    ```
+-   **Creates `playwright.config.ts`**: Full BDD configuration with:
+    -   Chromium, Firefox, and WebKit browsers
+    -   Web server on `localhost:6161`
+    -   HTML reporter
+-   **Demo files**: Includes example feature and step definitions
+-   **⚠️ Remember** to modify `demo.feature` to match your app's content
+
 ## Features
 
 -   **Auto-detects project root**: Walks up from current directory to find `package.json`

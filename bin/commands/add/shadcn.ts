@@ -2,7 +2,7 @@ import boxen from "boxen";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import ora from "ora";
 import { join } from "path";
-import { createInterface } from "readline";
+import { select } from "@inquirer/prompts";
 import { installPackages } from "../../utils/packages.ts";
 import { detectManager, findProjectRoot } from "../../utils/project.ts";
 import { addTailwind, isTailwindSetup } from "./tailwind.ts";
@@ -30,27 +30,23 @@ function detectFramework(projectRoot: string): Framework | null {
 
 // Ask user which framework to use
 async function askFramework(): Promise<Framework> {
-    return new Promise((resolve) => {
-        const rl = createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-
-        console.log(
-            "\n🤔 Both React and Svelte detected. Which framework do you want to use for shadcn?"
-        );
-        console.log("  1) React");
-        console.log("  2) Svelte");
-
-        rl.question("\nEnter your choice (1 or 2): ", (answer) => {
-            rl.close();
-            if (answer.trim() === "2") {
-                resolve("svelte");
-            } else {
-                resolve("react");
-            }
-        });
+    const answer = await select({
+        message: "Both React and Svelte detected. Which framework do you want to use for shadcn?",
+        choices: [
+            {
+                name: "React",
+                value: "react" as const,
+                description: "Use shadcn/ui for React",
+            },
+            {
+                name: "Svelte",
+                value: "svelte" as const,
+                description: "Use shadcn-svelte",
+            },
+        ],
     });
+
+    return answer;
 }
 
 export async function addShadcn() {
