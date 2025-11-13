@@ -134,7 +134,8 @@ async function setupVitest(
                 "@sveltejs/vite-plugin-svelte",
                 "@vitest/ui",
             ],
-            manager as any
+            manager as any,
+            true
         );
         spinner.succeed("Installed Vitest dependencies");
     } catch (error) {
@@ -222,7 +223,8 @@ async function setupPlaywright(
         await installPackages(
             projectRoot,
             ["@playwright/test", "playwright", "playwright-bdd"],
-            manager as any
+            manager as any,
+            true
         );
         spinner.succeed("Installed Playwright dependencies");
     } catch (error) {
