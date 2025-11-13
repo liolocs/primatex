@@ -5,6 +5,9 @@ import ora from "ora";
 import { join } from "path";
 import { installPackages } from "../../utils/packages.ts";
 import { detectManager, findProjectRoot } from "../../utils/project.ts";
+import { fixturesContent } from "./templates/test/fixtures.ts";
+import { homeFeatureContent } from "./templates/test/home-feature.ts";
+import { homePageContent } from "./templates/test/HomePage.ts";
 
 type TestOption = "vitest" | "playwright";
 
@@ -222,7 +225,7 @@ async function setupPlaywright(
     const testDir = join(projectRoot, "test");
     const e2eDir = join(testDir, "e2e");
     const featuresDir = join(e2eDir, "features");
-    const stepsDir = join(e2eDir, "steps");
+    const stepsDir = join(featuresDir, "steps");
 
     [testDir, e2eDir, featuresDir, stepsDir].forEach((dir) => {
         if (!existsSync(dir)) {
@@ -231,38 +234,20 @@ async function setupPlaywright(
     });
     console.log("✅ Created test directory structure");
 
-    // Create demo.step.ts
-    const demoStepPath = join(stepsDir, "demo.step.ts");
-    const demoStepContent = `import { expect } from "@playwright/test";
-import { createBdd } from "playwright-bdd";
+    // Create home.feature
+    const homeFeaturePath = join(featuresDir, "home.feature");
+    writeFileSync(homeFeaturePath, homeFeatureContent);
+    console.log("✅ Created test/e2e/features/home.feature");
 
-const { Given, When, Then } = createBdd();
+    // Create fixtures.ts
+    const fixturesPath = join(stepsDir, "fixtures.ts");
+    writeFileSync(fixturesPath, fixturesContent);
+    console.log("✅ Created test/e2e/features/steps/fixtures.ts");
 
-Given("I am on the home page", async ({ page }) => {
-    await page.goto("http://localhost:6161/");
-});
-
-Then("I should see {string} text", async ({ page }, content: string) => {
-    await expect(page.getByText(content)).toBeVisible();
-});
-`;
-
-    writeFileSync(demoStepPath, demoStepContent);
-    console.log("✅ Created test/e2e/steps/demo.step.ts");
-
-    // Create demo.feature
-    const demoFeaturePath = join(featuresDir, "demo.feature");
-    const demoFeatureContent = `Feature: Demo functionality
-  As a user
-  I want to be able to view the demo page
-
-  Scenario: User visits home page
-    Given I am on the home page
-    Then I should see "counter" text
-`;
-
-    writeFileSync(demoFeaturePath, demoFeatureContent);
-    console.log("✅ Created test/e2e/features/demo.feature");
+    // Create HomePage.ts
+    const homePagePath = join(stepsDir, "HomePage.ts");
+    writeFileSync(homePagePath, homePageContent);
+    console.log("✅ Created test/e2e/features/steps/HomePage.ts");
 
     // Create playwright.config.ts
     const playwrightConfigPath = join(projectRoot, "playwright.config.ts");
@@ -270,8 +255,7 @@ Then("I should see {string} text", async ({ page }, content: string) => {
 
 import { defineBddConfig } from "playwright-bdd";
 const testDir = defineBddConfig({
-    features: "test/e2e/features",
-    steps: "test/e2e/steps",
+    featuresRoot: "test/e2e/features",
 });
 /**
  * Read environment variables from file.
