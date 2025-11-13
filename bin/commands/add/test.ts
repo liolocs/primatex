@@ -8,6 +8,9 @@ import { detectManager, findProjectRoot } from "../../utils/project.ts";
 import { fixturesContent } from "./templates/test/fixtures.ts";
 import { homeFeatureContent } from "./templates/test/home-feature.ts";
 import { homePageContent } from "./templates/test/HomePage.ts";
+import { playwrightConfigContent } from "./templates/test/playwright-config.ts";
+import { vitestConfigContent } from "./templates/test/vitest-config.ts";
+import { vitestSetupClientContent } from "./templates/test/vitest-setup-client.ts";
 
 type TestOption = "vitest" | "playwright";
 
@@ -118,41 +121,12 @@ async function setupVitest(
 
     // Create vitest.config.js
     const vitestConfigPath = join(projectRoot, "vitest.config.js");
-    const vitestConfig = `import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { playwright } from "@vitest/browser-playwright";
-import { defineConfig } from "vitest/config";
-
-export default defineConfig({
-    plugins: [
-        svelte({
-            compilerOptions: {
-                dev: true,
-            },
-        }),
-    ],
-    test: {
-        include: [
-            "components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
-        ],
-        browser: {
-            enabled: true,
-            provider: playwright(),
-            instances: [{ browser: "chromium" }],
-        },
-        setupFiles: ["./vitest-setup-client.ts"],
-    },
-});
-`;
-
-    writeFileSync(vitestConfigPath, vitestConfig);
+    writeFileSync(vitestConfigPath, vitestConfigContent);
     console.log("✅ Created vitest.config.js");
 
     // Create vitest-setup-client.ts
     const setupClientPath = join(projectRoot, "vitest-setup-client.ts");
-    const setupClientContent = `/// <reference types="@vitest/browser/matchers" />
-`;
-
-    writeFileSync(setupClientPath, setupClientContent);
+    writeFileSync(setupClientPath, vitestSetupClientContent);
     console.log("✅ Created vitest-setup-client.ts");
 
     // Update package.json scripts
@@ -251,84 +225,7 @@ async function setupPlaywright(
 
     // Create playwright.config.ts
     const playwrightConfigPath = join(projectRoot, "playwright.config.ts");
-    const playwrightConfig = `import { defineConfig, devices } from "@playwright/test";
-
-import { defineBddConfig } from "playwright-bdd";
-const testDir = defineBddConfig({
-    featuresRoot: "test/e2e/features",
-});
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
-export default defineConfig({
-    testDir,
-    /* Run tests in files in parallel */
-    fullyParallel: true,
-    /* Fail the build on CI if you accidentally left test.only in the source code. */
-    forbidOnly: !!process.env.CI,
-    /* Retry on CI only */
-    retries: process.env.CI ? 2 : 0,
-    /* Opt out of parallel tests on CI. */
-    workers: process.env.CI ? 1 : undefined,
-    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-    reporter: "html",
-    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-    use: {
-        /* Base URL to use in actions like \`await page.goto('')\`. */
-        // baseURL: 'http://localhost:3000',
-        /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: "on-first-retry",
-    },
-    /* Configure projects for major browsers */
-    projects: [
-        {
-            name: "chromium",
-            use: { ...devices["Desktop Chrome"] },
-        },
-        {
-            name: "firefox",
-            use: { ...devices["Desktop Firefox"] },
-        },
-        {
-            name: "webkit",
-            use: { ...devices["Desktop Safari"] },
-        },
-        /* Test against mobile viewports. */
-        // {
-        //   name: 'Mobile Chrome',
-        //   use: { ...devices['Pixel 5'] },
-        // },
-        // {
-        //   name: 'Mobile Safari',
-        //   use: { ...devices['iPhone 12'] },
-        // },
-        /* Test against branded browsers. */
-        // {
-        //   name: 'Microsoft Edge',
-        //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-        // },
-        // {
-        //   name: 'Google Chrome',
-        //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-        // },
-    ],
-    /* Run your local dev server before starting the tests */
-    webServer: {
-        command: "bun run build && bun run serve",
-        url: "http://localhost:6161",
-        reuseExistingServer: !process.env.CI,
-    },
-});
-`;
-
-    writeFileSync(playwrightConfigPath, playwrightConfig);
+    writeFileSync(playwrightConfigPath, playwrightConfigContent);
     console.log("✅ Created playwright.config.ts");
 
     // Update package.json scripts
