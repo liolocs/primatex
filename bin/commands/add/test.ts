@@ -146,7 +146,7 @@ async function setupVitest(
 
     // Get the appropriate run command for the package manager
     const runCommands: Record<string, string> = {
-        bun: "bun test",
+        bun: "bun run test",
         pnpm: "pnpm test",
         yarn: "yarn test",
         npm: "npm test",
