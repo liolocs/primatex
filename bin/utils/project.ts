@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 
 // Find the nearest package.json directory by walking up from CWD
@@ -40,5 +40,28 @@ export function detectManager(projectRoot: string): "bun" | "pnpm" | "yarn" | "n
   }
   // Default fallback
   return "npm";
+}
+
+// Detect port from config/app.ts
+export function detectPort(projectRoot: string): number {
+  const configPath = join(projectRoot, "config", "app.ts");
+  
+  if (!existsSync(configPath)) {
+    return 6161; // Default port
+  }
+  
+  try {
+    const configContent = readFileSync(configPath, "utf-8");
+    const portMatch = configContent.match(/port:\s*(\d+)/);
+    
+    if (portMatch && portMatch[1]) {
+      return parseInt(portMatch[1], 10);
+    }
+  } catch {
+    // If reading fails, return default
+    return 6161;
+  }
+  
+  return 6161; // Default port if not found in config
 }
 

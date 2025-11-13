@@ -4,7 +4,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import ora from "ora";
 import { join } from "path";
 import { installPackages } from "../../utils/packages.ts";
-import { detectManager, findProjectRoot } from "../../utils/project.ts";
+import {
+    detectManager,
+    detectPort,
+    findProjectRoot,
+} from "../../utils/project.ts";
 import { fixturesContent } from "./templates/test/fixtures.ts";
 import { homeFeatureContent } from "./templates/test/home-feature.ts";
 import { homePageContent } from "./templates/test/HomePage.ts";
@@ -56,6 +60,25 @@ function isPlaywrightConfigured(projectRoot: string): boolean {
         );
     } catch {
         return false;
+    }
+}
+
+// Update .gitignore with test-related entries
+function updateGitignore(projectRoot: string, entries: string[]): void {
+    const gitignorePath = join(projectRoot, ".gitignore");
+
+    let content = "";
+    if (existsSync(gitignorePath)) {
+        content = readFileSync(gitignorePath, "utf-8");
+    }
+
+    const lines = content.split("\n");
+    const entriesToAdd = entries.filter((entry) => !lines.includes(entry));
+
+    if (entriesToAdd.length > 0) {
+        const newContent =
+            content.trim() + "\n" + entriesToAdd.join("\n") + "\n";
+        writeFileSync(gitignorePath, newContent);
     }
 }
 
@@ -180,6 +203,18 @@ async function setupPlaywright(
         })
     );
 
+    // Detect port from project config
+    const port = detectPort(projectRoot);
+
+    // Define package runner based on manager
+    const packageRunnerMap: Record<string, string> = {
+        bun: "bunx --bun",
+        pnpm: "pnpm exec",
+        yarn: "yarn",
+        npm: "npx",
+    };
+    const packageRunner = packageRunnerMap[manager] || "npx";
+
     // Install packages
     const spinner = ora("Installing Playwright and dependencies...").start();
 
@@ -220,13 +255,24 @@ async function setupPlaywright(
 
     // Create HomePage.ts
     const homePagePath = join(stepsDir, "HomePage.ts");
-    writeFileSync(homePagePath, homePageContent);
+    writeFileSync(homePagePath, homePageContent(port));
     console.log("✅ Created test/e2e/features/steps/HomePage.ts");
 
     // Create playwright.config.ts
     const playwrightConfigPath = join(projectRoot, "playwright.config.ts");
-    writeFileSync(playwrightConfigPath, playwrightConfigContent);
+    writeFileSync(
+        playwrightConfigPath,
+        playwrightConfigContent(port, packageRunner)
+    );
     console.log("✅ Created playwright.config.ts");
+
+    // Update .gitignore
+    updateGitignore(projectRoot, [
+        ".features-gen/",
+        "playwright-report/",
+        "test-results/",
+    ]);
+    console.log("✅ Updated .gitignore");
 
     // Update package.json scripts
     const packageJsonPath = join(projectRoot, "package.json");
@@ -260,7 +306,7 @@ async function setupPlaywright(
 
     console.log(
         boxen(
-            `✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/demo.feature\n   to match your actual application content\n\n🚀 Run '${runCommand}' to run tests\n📚 Playwright docs: https://playwright.dev`,
+            `✅ Playwright BDD setup complete!\n\n⚠️  Remember to modify test/e2e/features/home.feature\n   to match your actual application content\n\n🚀 Run '${runCommand}' to run tests\n📚 Playwright docs: https://playwright.dev`,
             {
                 padding: 1,
                 margin: 1,

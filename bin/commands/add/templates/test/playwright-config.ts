@@ -1,6 +1,9 @@
-export const playwrightConfigContent = `import { defineConfig, devices } from "@playwright/test";
-
+export const playwrightConfigContent = (
+    port: number,
+    packageRunner: string
+) => `import { defineConfig, devices } from "@playwright/test";
 import { defineBddConfig } from "playwright-bdd";
+
 const testDir = defineBddConfig({
     featuresRoot: "test/e2e/features",
 });
@@ -68,10 +71,9 @@ export default defineConfig({
     ],
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: "bun run build && bun run serve",
-        url: "http://localhost:6161",
+        command: "${packageRunner} primate build && ${packageRunner} primate serve",
+        url: "http://localhost:${port}",
         reuseExistingServer: !process.env.CI,
     },
 });
 `;
-
